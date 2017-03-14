@@ -18,6 +18,8 @@ import demo.calculator.TCalculatorService;
 
 @SpringBootApplication
 public class App {
+	ExecutorService executor = Executors.newSingleThreadExecutor();
+
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
 	}
@@ -26,8 +28,6 @@ public class App {
 	TProtocolFactory protocolFactory() {
 		return new TBinaryProtocol.Factory();
 	}
-
-	ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	@Bean(destroyMethod = "stop")
 	TServer calculator(TCalculatorService.Iface calcService) throws TException {
