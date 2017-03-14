@@ -8,9 +8,8 @@ import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TServerTransport;
+import org.apache.thrift.server.TThreadedSelectorServer;
+import org.apache.thrift.transport.TNonblockingServerSocket;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +33,11 @@ public class App {
 	TServer calculator(TCalculatorService.Iface calcService) throws TException {
 		int port = Optional.ofNullable(System.getenv("PORT")).map(Integer::parseInt)
 				.orElse(8080);
-		TServerTransport serverTransport = new TServerSocket(port);
-		TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport)
-				.processor(new TCalculatorService.Processor<>(calcService))
-				.protocolFactory(protocolFactory()));
+		TNonblockingServerSocket serverTransport = new TNonblockingServerSocket(port);
+		TServer server = new TThreadedSelectorServer(
+				new TThreadedSelectorServer.Args(serverTransport)
+						.processor(new TCalculatorService.Processor<>(calcService))
+						.protocolFactory(protocolFactory()));
 		executor.execute(server::serve);
 		System.out.println("Started! on " + port);
 		return server;

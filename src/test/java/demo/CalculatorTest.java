@@ -5,6 +5,8 @@ import demo.calculator.TDivisionByZeroException;
 import demo.calculator.TOperation;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
+import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.junit.After;
@@ -29,7 +31,7 @@ public class CalculatorTest {
 
     @Before
     public void setUp() throws Exception {
-        transport = new TSocket("localhost", 8080);
+        transport = new TFramedTransport(new TSocket("localhost", 8080));
         transport.open();
         TProtocol protocol = protocolFactory.getProtocol(transport);
         this.client = new TCalculatorService.Client(protocol);
