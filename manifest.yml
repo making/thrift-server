@@ -1,0 +1,7 @@
+applications:
+- name: thrift-server
+  path: target/thrift-server-1.0-SNAPSHOT.jar
+  buildpack: java_buildpack
+  memory: 512m
+  routes:
+  - route: tcp.local.pcfdev.io:61001
