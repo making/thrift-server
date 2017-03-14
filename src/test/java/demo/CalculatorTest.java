@@ -5,37 +5,39 @@ import demo.calculator.TDivisionByZeroException;
 import demo.calculator.TOperation;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
-import org.apache.thrift.transport.THttpClient;
+import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = App.class)
-@WebAppConfiguration
-@IntegrationTest({"server.port:0"})
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class CalculatorTest {
     @Autowired
     TProtocolFactory protocolFactory;
-    @Value("${local.server.port}")
-    int port;
     TCalculatorService.Client client;
+    TTransport transport;
+
 
     @Before
     public void setUp() throws Exception {
-        TTransport transport = new THttpClient("http://localhost:" + port + "/calculator");
+        transport = new TSocket("localhost", 8080);
+        transport.open();
         TProtocol protocol = protocolFactory.getProtocol(transport);
         this.client = new TCalculatorService.Client(protocol);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        transport.close();
     }
 
     @Test
